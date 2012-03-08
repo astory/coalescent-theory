@@ -1,0 +1,140 @@
+\documentclass{article}
+
+\usepackage{amsmath}
+\usepackage{color}
+\usepackage{listings}
+\usepackage{xfrac}
+
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+
+\lstset{ %
+  language=Python,                % the language of the code
+  basicstyle=\footnotesize,           % the size of the fonts that are used for the code
+  numbers=left,                   % where to put the line-numbers
+  numberstyle=\tiny\color{gray},  % the style that is used for the line-numbers
+  stepnumber=2,                   % the step between two line-numbers. If it's 1, each line 
+                                  % will be numbered
+  numbersep=5pt,                  % how far the line-numbers are from the code
+  backgroundcolor=\color{white},      % choose the background color. You must add \usepackage{color}
+  showspaces=false,               % show spaces adding particular underscores
+  showstringspaces=false,         % underline spaces within strings
+  showtabs=false,                 % show tabs within strings adding particular underscores
+  frame=single,                   % adds a frame around the code
+  rulecolor=\color{black},        % if not set, the frame-color may be changed on line-breaks within not-black text (e.g. commens (green here))
+  tabsize=2,                      % sets default tabsize to 2 spaces
+  captionpos=b,                   % sets the caption-position to bottom
+  breaklines=true,                % sets automatic line breaking
+  breakatwhitespace=true,        % sets if automatic breaks should only happen at whitespace
+  title=\lstname,                   % show the filename of files included with \lstinputlisting;
+                                  % also try caption instead of title
+  keywordstyle=\color{blue},          % keyword style
+  commentstyle=\color{dkgreen},       % comment style
+  stringstyle=\color{mauve},         % string literal style
+  escapeinside={\%*}{*)},            % if you want to add a comment within your code
+  morekeywords={*,...}               % if you want to add more keywords to the set
+}
+
+\title{Problem Set 1}
+\author{Alec Story \\ \small{avs38}}
+
+\begin{document}
+\maketitle
+
+\section{}
+    \subsection{}
+    $\xi_1 = 2$, $ \xi_2 = 1$, $ \xi_3 = 0$, $ \xi_4 = 1$
+    \subsection{}
+    \begin{align*}
+    \eta_1 =& \frac{\xi_1 + \xi_4}{1 + \delta_{1, 4}} = \frac{2 + 1}{1} = 3 \\
+    \eta_2 =& \frac{\xi_2 + \xi_3}{1 + \delta_{2, 3}} = \frac{1 + 0}{1} = 1
+    \end{align*}
+    \subsection{}
+    \begin{align*}
+    S =& \sum_{i=1}^{\lfloor \sfrac{n}{2} \rfloor} \eta_i = 4 \\
+    \pi =& \frac{1}{\binom{n}{2}}
+           \sum_{i=1}^{\lfloor \sfrac{n}{2} \rfloor} i (n - i) \eta_i = 
+           \frac{1}{10} \sum_{i=1}^{2} i (n - i) \eta_i = 1.8
+    \end{align*}
+    \subsection{}
+    \pagebreak
+\section{}
+By assuming infinite population size, we assume that no simultaneous coalescent
+events occur.  If we break this assumption, then we could have multiple
+coalescent events occuring in the same generation, which could result in
+genealogy trees containing nodes of degree greater than two.
+\section{}
+\subsection{}
+    \begin{figure}[h]
+    \begin{center}
+        \input{P_MRCA}
+    \end{center}
+    \end{figure}
+    From the graph, it is clear that the probablity of a sample sharing its MRCA
+    with that of the population as a whole rapidly converges to 1 as the sample
+    size grows.
+\subsection{}
+Base case:  j = 1.  $$\frac{j - 1}{j + 1} \cdot \frac{i + 1}{i - 1} =
+                      \frac{0}{2} \cdot \frac{i + 1}{i - 1} = 0$$
+With only one lineage, it is its own MRCA, and since $i > j$, one lineage cannot
+be the MRCA of the entire sample.
+
+Inductive step:
+Assume $P(j) = \frac{j - 1}{j + 1} \cdot \frac{i + 1}{i - 1}$.  We show
+$P(j+1) = \frac{j}{j + 2} \cdot \frac{i + 1}{i - 1}$ as follows:
+
+I actually couldn't figure out how to finish the proof.  Here's as far as I got:
+
+If we share the MRCA with the larger sample, then it must be the case that at
+least two of the individuals in our smaller sample coalesce at the MRCA.  Then,
+at least one of the $j+1$ groupings of individuals will coalesce at the MRCA.
+Each of these groupings independently coalesces at the MRCA with probablity
+$P(j)$, but because together they are not independent, I don't know where to
+proceed from herel.
+
+Ultimately, we need to multiply $P(j)$ by $\frac{j + 1}{j - 1} \cdot \frac{j}{j + 2}$ in
+order to get $P(j+1)$.
+
+\section{}
+The expected length of time during which there are an even number of lineages
+present is the sum of $T_i$ for even $i$.  Because all $T_i$ are independent,
+the expectation of their sum is the sum of their expectations, so we get
+$$\sum_{i=1}^5 E[T_{2i}] = \sum_{i=1}^5 \frac{2}{2i (2i - 1)} = 1.29 $$
+
+The expected time with an odd number of lineages (excluding one lineage, which
+would project infinitely backwards in time) is similar:
+$$\sum_{i=1}^4 E[T_{2i+1}] = \sum_{i=1}^4 \frac{2}{(2i+1) (2i)} = 0.508 $$
+\section{}
+When run on a sample size of 10, a $T_{MRCA}$ of 1.287 was obtained, and a
+total branch length of 4.139.  When run 20 times on a sample size of 10, for
+$T_{MRCA}$, the mean was 1.77, and the standard deviation 1.13, while for
+total branch length the mean was 5.38 and the standard deviation 2.59
+
+The expected value for $T_{MRCA}$ is $2 (1 - \sfrac{1}{n}) = 1.8$, and the
+standard deviation is 1.076.  The expected value for the total branch length is
+5.67 and the standard deviation is 2.48.  In both cases, the experimental data
+is not far off.
+
+The running time for 100 individuals is less than one fortieth of a second on a
+2.8 GHz machine, over 2000 times faster than the Fisher-Wright model.
+
+\pagebreak
+
+\lstinputlisting[language=Python]{coalescent.py}
+\section{}
+
+Because $t$ is usually defined in terms of $N$, we will use $t$ to refer to $t$
+scaled to $N$ throughout, and not to $2N$.
+
+\begin{align*}
+E(T_{MRCA}) =& E(T_{MRCA} < t_0) + E(T_{MRCA} > t_0) \\
+            =& \int_0^{t_0} t \frac{i (i-1)}{2} e^{-\frac{i (i-1)}{2}t} dt +
+               \int_{t_0}^{\infty} t\frac{i (i-1)}{2}
+                    e^{-\frac{i (i-1)}{2}\frac{t}{2}} dt \\
+            =& \int_0^{t_0} t e^{-t} dt +
+               \int_{t_0}^{\infty} t e^{-\frac{t}{2}} dt \\
+            =& 1-e^{-t_0} (1+t_0)+2 e^{-\frac{t_0}{2}} (2+t_0)
+\end{align*}
+
+\end{document}
