@@ -10,6 +10,7 @@
 \definecolor{mauve}{rgb}{0.58,0,0.82}
 
 \renewcommand{\thesubsection}{\alph{subsection}}
+\renewcommand{\thesubsubsection}{\roman{subsubsection}}
 
 \lstset{ %
   language=Python,                % the language of the code
@@ -49,11 +50,12 @@
 Since the mutation process is independent of the genealogical process, this is
 equivalent to no mutation occuring on the path through the tree from one, to
 their MRCA, and back down to the other.  Since we're ignoring the other
-individuals in the sample, this is just $T_{MRCA}$ for $i=2$, which is equal to
-$T_2$, or 1.  Taking the number of mutations $K$ as a Poisson random variable, we
-get $$P\{K=0 | t=1\} = \frac{(\frac{\theta \cdot 1}{2})^0}{0!} \cdot
-                      e^{-\frac{\theta \cdot 1}{2}}
-                    = e ^{-\frac{\theta}{2}}$$
+individuals in the sample, the time for this is just $2 \cdot T_{MRCA}$ for
+$i=2$, which is equal to $2 \cdot T_2$, or 2.  Taking the number of mutations
+$K$ as a Poisson random variable, we get
+$$P\{K=0 | t=1\} = \frac{(\frac{\theta \cdot 2}{2})^0}{0!} \cdot
+                   e^{-\frac{\theta \cdot 2}{2}}
+                 = e ^{-\theta}$$
 
 Extending this to the entire genealogy of n individuals is, then, the chance
 that there is no mutation over the entire branch length of the tree.
@@ -72,6 +74,85 @@ its expectation is $2(1-\frac{1}{n})$.  Again taking mutations to be Poisson
 distributed over that many generations, we get $E[K|t=2(1-\frac{1}{n})] =
 \frac{\theta 2(1-\frac{1}{n})}{2} = \theta (1-\frac{1}{n})$
 \section{}
+For simplicity, we refer to the $n-1^\textrm{st}$ and $n-2^\textrm{nd}$
+individuals as ``the mutants.''
+
+Let $T_{R}$ be the time to the most recent common ancestor of the $n$ remainder
+individuals.
+
+Conceptually, we approach this problem by determining how much of the branch
+length leading to the two mutants lies within the genealogy of the remainder
+such that a mutation there would leave some of the remainder with one allele and
+some with the other.  Since we are using the infinite sites model, only one
+mutation at this locus can occur, so if we can determine the length $l$ of this
+critical section, since we know the total length where the mutation could fall
+($2 \cdot E[T_{MRCA}]$), the probability that the mutation spares the remainder is $1 -
+\frac{l}{2 \cdot E[T_{MRCA}]}$.
+
+First, consider the four cases that could lead the rest of the tree being
+monomorphic:
+\begin{description}
+\item[a] Both mutants are outgroups to the remainder.  The probability of this
+case is the probability that all the n individuals coalesce together before
+coalescing with the mutants, $P(a) = \Pi_{i=1}^{n-1}\frac{n-1}{n+2-i}$.
+\vspace{1in}
+
+In this case, the critical section is entirely outside of the tree, so $l=0$.
+
+\item[b] One mutant coalesces with the remainder at time $c$, and the other at
+the MRCA of the entire sample.  This happens if the $n+1$ individuals including
+one mutant coalesce together before the coalesce with the remaining mutant, but
+not if they all coalesce first (case a), and since there are two ways to do this
+we multiply by two to get $P(b) = 2 \Pi_{i=1}^n\frac{n-i}{n+2-i} - P(a)$.
+\vspace{1in}
+
+In this case, the critical section is of length $l = T_R - c$.
+
+\item[c] One mutant coalesces with the remainder at time $c_1$, and the other at
+time $c_2$, and then they both coalesce at time $c_3$ where $c_1, c_2< c_3 < T_R$.
+$P(c) = 1 - P(a) - P(b) - P(d)$.
+\vspace{1in}
+
+In this case, the critical section is of length $l = (c_3 - c_1) + (c_3 - c_2)$.
+
+\item[d] Both mutants coalesce with each other before they coalesce with the
+remainder.  $P(d) = \frac{1}{n+1}$.
+\vspace{1in}
+
+In this case, the critical section is entirely outside the tree, so $l = 0$
+
+Since these cases are independent, this leaves us to calculate the various
+values we need:
+\begin{align*}
+E[T_{MRCA}] &= 2 ( 1 - \frac{1}{n+2}) \\
+E[T_R] &= 2 ( 1 - \frac{1}{n}) \\
+E[c] = E[c_1] = E[c_2] &= E[\textrm{One lineage coalescing with n}] =
+                          \sum_{i=0}^{n-2} t(i)
+                          (\frac{1}{n+1-i} + \frac{1}{n-i})\\
+E[c_3] &= E[T_2] = 1 \\
+\end{align*}
+
+where $t(i)$ is the expected time of the $i^{\textrm{th}}$ coalescent event
+(equivalently, the coalescent event when $n-i+1+1$ lineages are present,
+which is equal to $\sum_{j=n-i+2}^{n+1} \frac{2}{j(j-1)}$.
+
+Note that the sum in $E[c]$ is not up to $n-1$ because in the case where the sum
+index reaches $n-1$, then we are considering the mutant coalescing \emph{after}
+all the remainder coalesce, which we explicitly exclude from that part of the
+probability space.
+
+By independence, then, we get that
+\begin{align*}
+E[l] &= P(b) \cdot (E[T_R] - E[c]) + P(c) \cdot (2E[c_3] - E[c_1] - E[c_2]) \\
+     &= P(b) \cdot (E[T_R] - E[c]) + P(c) \cdot (2E[c_3] - 2E[c_1])
+\end{align*}
+
+which does not simplify further on expansion, so I will leave it unsubstituted.
+Recalling our first deductions, the final probability is $1 -
+\frac{E[l]}{E[T_2]}$.
+
+\end{description}
+
 \section{}
 \begin{align*}
 E[K] &= \frac{\theta}{2} \cdot \{\textrm{The length of branches ancestral to
@@ -80,13 +161,34 @@ E[K] &= \frac{\theta}{2} \cdot \{\textrm{The length of branches ancestral to
      &= \frac{\theta}{2} \cdot (2 \tau + 2 W_A - W_1 - W_2) \\
      &= \theta \cdot (\tau + W_A - \frac{W_1 + W_2}{2})
 \end{align*}
+
 \section{}
 \subsection{}
 \input{Tij}
+This approximately matches the bimodal distribution we discussed in class, where
+very high and very low pairwise differences dominate, as expected.
 \subsection{}
 The average $T_{MRCA}$ for 20 runs with a sample size of 100 and $t_0 = 0.3$ is
 1.12.  This corresponds closely to the expected value calculated on the previous
 problem set $2 - e^{-t_0/2} = 1.14$.
+\subsection{}
+\subsubsection{}
+When run with 10 individuals and $\theta = 0.1$, most of the time, no mutations
+occur.  Here is a (more interesting) run at $\theta = 10$:
+\begin{verbatim}
+0010000000010010100100
+0000010010000100100100
+0000000000000000100100
+0001000000001000011011
+0001000000001000011011
+1000100000001000011011
+0100001101100001000000
+0000001101100001000000
+0000001101100001000000
+0000001101100001000000
+\end{verbatim}
+\subsubsection{}
+%TODO(astory): Finish.  This is weird because scaling.
 \section{}
 \subsection{Constant Population Size}
 \includegraphics[width=\textwidth]{constant_size}
@@ -94,8 +196,25 @@ Tajima's D = -0.03756
 \subsection{Growth at $\alpha = 100$}
 \includegraphics[width=\textwidth]{growth}
 Tajima's D = -1.93785
+
+Growth creates more alleles with low frequency because the genealogical tree has
+more time towards the leaves than in the constant model, so there is more time
+for mutations to occur that only affect a few individuals.  This also affects
+Tajima's D by lowering it, since these mutations contribute little to the
+pairwise differences while increasing the total number of segregating sites.
 \subsection{Bottleneck at $t=0.3$}
 \includegraphics[width=\textwidth]{bottleneck}
 Tajima's D = 0.58793
+
+A bottleneck creates more alleles with high frequency because the alleles that
+make it through the bottleneck are likely to remain at a high frequency
+throughout the subsequent time.  This raises Tajima's D because these alleles
+contribute highly to the pairwise differences.
+
+\section{Code}
+\subsection{coalescent.py}
+\lstinputlisting[language=Python]{coalescent.py}
+\subsection{lineage.py}
+\lstinputlisting[language=Python]{lineage.py}
 
 \end{document}
