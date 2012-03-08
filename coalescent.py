@@ -2,6 +2,7 @@
 from random import sample, expovariate
 import argparse
 import pickle
+import sys
 
 # This has to be a class rather than a named tuple because we want objects with
 # identical contents (i.e., the starting lineages) to be distinct.
@@ -15,10 +16,10 @@ class Lineage():
     def __str__(self):
         return "Lineage coalescing at " + str(self.time)
 
-def coalescence_time(i):
-    return expovariate((i * (i - 1)) / 2.0)
+def coalescence_time(i, n=1):
+    return expovariate(n * (i * (i - 1)) / 2.0)
 
-def coalesce(prev_time, lineages):
+def coalesce(prev_time, lineages, t0=None):
     """Select two lineages to merge after an appropriate period of time.
     
     ARGS:
@@ -30,7 +31,21 @@ def coalesce(prev_time, lineages):
         prev_time plus the coalescent time for this coalescence
     """
     left, right = sample(lineages, 2)
-    time = prev_time + coalescence_time(len(lineages))
+    if t0 is not None:
+        if prev_time > t0:
+            # if we start over t0, use the smaller population
+            time = prev_time + coalescence_time(len(lineages), n=1)
+        else:
+            coal_time = coalescence_time(len(lineages), n=2)
+            if coal_time + prev_time < t0:
+                # if we're still under t0, behave as normal
+                time = coal_time + prev_time
+            else:
+                # halve the time over t0 to account for faster coalescence with
+                # smaller population
+                time = 0.5*(coal_time + prev_time - t0) + t0
+    else:
+        time = prev_time + coalescence_time(len(lineages))
     new_lineage = Lineage(time, left, right)
     lineages.remove(left)
     lineages.remove(right)
@@ -44,12 +59,12 @@ def create_starting_population(i):
         lineages.add(Lineage(0.0, None, None))
     return lineages
 
-def simulate(n):
+def simulate(n, t0=None):
     """Run a simulation on a sample of size n"""
     lineages = create_starting_population(n)
     time = 0
     while len(lineages) > 1:
-        time = coalesce(time, lineages)
+        time = coalesce(time, lineages, t0=t0)
     return lineages.pop()
 
 def branch_length(lineage):
@@ -112,12 +127,14 @@ def main():
     parser.add_argument('--T_MRCA', action='store_true', default=False)
     parser.add_argument('--branch_length', action='store_true', default=False)
     parser.add_argument('--tij', action='store_true', default=False)
+    parser.add_argument('-t', '--t0', default=None, help='time at which '
+                        'growth from N to present 2N occurred')
     args = parser.parse_args()
 
     if args.input:
         root = load(args.input)
     else:
-        root = simulate(args.n)
+        root = simulate(args.n, t0=float(args.t0))
 
     if args.output:
         save(root, args.output)
