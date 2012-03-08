@@ -129,13 +129,10 @@ def main():
             print '\n'.join([''.join(x) for x in stringified])
         if args.frequency:
             frequency = lineage.build_site_frequency(converted)
-            total = 0.0
             for i in range(1, max(frequency.keys() + [-1, args.n/2]) + 1):
                 if i in frequency:
-                    total += frequency[i]
-            for i in range(1, max(frequency.keys() + [-1, args.n/2]) + 1):
-                if i in frequency:
-                    print "{}\t{:f}\t{:f}".format(i, frequency[i],
+                    print "{}\t{:f}\t{:f}".format(i,
+                                       float(frequency[i])/args.n,
                                        e_eta_i(args.theta, i, args.n))
                 else:
                     print "{}\t{:f}\t{:f}".format(i, 0,
