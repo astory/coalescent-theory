@@ -106,14 +106,16 @@ not if they all coalesce first (case a), and since there are two ways to do this
 we multiply by two to get $P(b) = 2 \Pi_{i=1}^n\frac{n-i}{n+2-i} - P(a)$.
 \vspace{1in}
 
-In this case, the critical section is of length $l = T_R - c$.
+In this case, the critical section within the remainder's tree is of length $l =
+T_R - c$.
 
 \item[c] One mutant coalesces with the remainder at time $c_1$, and the other at
 time $c_2$, and then they both coalesce at time $c_3$ where $c_1, c_2< c_3 < T_R$.
 $P(c) = 1 - P(a) - P(b) - P(d)$.
 \vspace{1in}
 
-In this case, the critical section is of length $l = (c_3 - c_1) + (c_3 - c_2)$.
+In this case, the critical section within the remainder's tree is of length $l =
+(c_3 - c_1) + (c_3 - c_2)$.
 
 \item[d] Both mutants coalesce with each other before they coalesce with the
 remainder.  $P(d) = \frac{1}{n+1}$.
@@ -126,14 +128,14 @@ values we need:
 \begin{align*}
 E[T_{MRCA}] &= 2 ( 1 - \frac{1}{n+2}) \\
 E[T_R] &= 2 ( 1 - \frac{1}{n}) \\
-E[c] = E[c_1] = E[c_2] &= E[\textrm{One lineage coalescing with n}] =
-                          \sum_{i=0}^{n-2} t(i)
+E[c] = E[c_1] = E[c_2] &= E[\textrm{Time of one lineage coalescing with n}] \\
+                       &= \sum_{i=0}^{n-2} t(i)
                           (\frac{1}{n+1-i} + \frac{1}{n-i})\\
 E[c_3] &= E[T_2] = 1 \\
 \end{align*}
 
 where $t(i)$ is the expected time of the $i^{\textrm{th}}$ coalescent event
-(equivalently, the coalescent event when $n-i+1+1$ lineages are present,
+(equivalently, the coalescent event when $n-i+1+1$ lineages are present),
 which is equal to $\sum_{j=n-i+2}^{n+1} \frac{2}{j(j-1)}$.
 
 Note that the sum in $E[c]$ is not up to $n-1$ because in the case where the sum
@@ -164,7 +166,10 @@ E[K] &= \frac{\theta}{2} \cdot \{\textrm{The length of branches ancestral to
 
 \section{}
 \subsection{}
+Run on 100 individuals:
+
 \input{Tij}
+
 This approximately matches the bimodal distribution we discussed in class, where
 very high and very low pairwise differences dominate, as expected.
 \subsection{}
@@ -188,7 +193,7 @@ occur.  Here is a (more interesting) run at $\theta = 10$:
 0000001101100001000000
 \end{verbatim}
 \subsubsection{}
-%TODO(astory): Finish.  This is weird because scaling.
+\input{eta}
 \section{}
 \subsection{Constant Population Size}
 \includegraphics[width=\textwidth]{constant_size}
